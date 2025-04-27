@@ -638,19 +638,19 @@ void main() {
     printf("Enter the text string: ");
     gets(textStr);
 
-    printf("\nEnter the pattern string: ");
+    printf(" Enter the pattern string: ");
     gets(patternStr);
 
     decision = naive(textStr, patternStr);
 
-    printf("\n");
+    printf(" ");
 
     if (decision != -1)
-        printf("\"%s\" is a substring of \"%s\"\n", patternStr, textStr);
+        printf("%s is a substring of %s ", patternStr, textStr);
     else
-        printf("\"%s\" is not a substring of \"%s\"\n", patternStr, textStr);
+        printf("%s is not a substring of %s ", patternStr, textStr);
 
-    printf("\n");
+    printf(" ");
 }
 
 // Function definition (after main)
