@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text File Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .file-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .file-item {
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-item:hover {
+            background: #e0e0e0;
+        }
+        .file-content {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .controls {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .search-box {
+            padding: 8px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text File Viewer</h1>
+        
+        <div class="controls">
+            <button id="copyBtn">Copy Content</button>
+        </div>
+        
+        <div class="file-list" id="fileList"></div>
+        <div class="file-content" id="fileContent">Select a file then press copy content</div>
+    </div>
+
+    <script>
+        // Embedded file data (paste your files here)
+        const textFiles = {
+            "1S.txt": `#include<stdio.h>
+void main(){
+int n  , i , j ,pos , larg;
+   printf("Enter a size of array :- ");
+    scanf("%d",&n);
+    printf("Enter %d Elements ",n);
+    int a[n];
+    for(int i = 0 ; i<n ; i++)
+        scanf("%d",&a[i]);
+    for(j =n-1 ; j>0 ; j-- ){
+        larg = a[0];
+        pos = 0;
+        for(i = 1 ; i<=j ;i++){
+            if(a[i]>larg){
+                larg = a[i];
+                pos = i;
+            }
+        }
+        a[pos]=a[j];
+        a[j]=larg;
+    }
+    printf("NOW,array is sorted :- ");
+    for(int i = 0 ; i<n ; i++)
+        printf("%d ",a[i]);
+}
+`,
+            
+            "3Q.txt": `#include <stdio.h>
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int lb, int ub) {
+    int down = lb;
+    int up = ub;
+    int x = arr[lb];
+    while (down < up) {
+        while (arr[down] <= x && down < up)
+            down++;
+        while (arr[up] > x)
+            up--;
+        if (down < up)
+            swap(&arr[down], &arr[up]);
+    }
+    swap(&arr[lb], &arr[up]);
+    return up;
+}
+
+void quicksort(int arr[], int lb, int ub) {
+    if (lb < ub) {
+        int j = partition(arr, lb, ub);
+        quicksort(arr, lb, j - 1);
+        quicksort(arr, j + 1, ub);
+    }
+}
+
+int main(void) {
+    int size = -1;
+    printf("Enter size of array: ");
+    scanf("%d", &size);
+    int array[size];
+    printf("Enter %d elements: ", size);
+    for (int i = 0; i < size; ++i) {
+        scanf("%d", &array[i]);
+    }
+    for (int i = 0; i < size; ++i)
+        printf("%d ", array[i]);
+    printf("\n");
+    quicksort(array, 0, size - 1);
+    for (int i = 0; i < size; ++i)
+        printf("%d ", array[i]);
+    printf("\n");
+    return 0;
+}
+`,
+           
+"2i.txt": `#include<stdio.h>
+int main(){
+    int n,i,k,x;
+    printf("Enter the size of array :- ");
+    scanf("%d",&n);
+    int a[n];
+    printf("Enter %d elements :- ");
+    for( i = 0 ; i<n ; i++)
+        scanf("%d",&a[i]);
+    for(k = 1 ; k<=n-1 ; k++ ){
+        x=a[k];
+        i=k-1;
+        while(i>=0 && a[i]>x){
+            a[i+1]=a[i];
+            i=i-1;
+        }
+        a[i+1]=x;
+    }
+    printf("The sorted list :- ");
+    for(i = 0 ; i<n ; i++)
+        printf("%d ",a[i]);
+
+
+}`,
+ 
+            "4M.txt": `#include <stdio.h>
+#include <math.h>
+
+void combine(int a[], int down, int mid, int up) {
+    int temp[10];
+    int k = down;
+    int i = down;
+    int j = mid + 1;
+    
+    while (i <= mid && j <= up) {
+        if (a[i] < a[j]) {
+            temp[k++] = a[i++];
+        } else {
+            temp[k++] = a[j++];
+        }
+    }
+    
+    while (i <= mid) {
+        temp[k++] = a[i++];
+    }
+    
+    while (j <= up) {
+        temp[k++] = a[j++];
+    }
+    
+    for (k = down; k <= up; ++k) {
+        a[k] = temp[k];
+    }
+}
+
+void mergesort(int a[], int down, int up) {
+    if (down < up) {
+        int mid = floor((float)(down + up) / 2);
+        mergesort(a, down, mid);
+        mergesort(a, mid + 1, up);
+        combine(a, down, mid, up);        
+    }
+}
+
+int main() {
+    int a[10];
+    printf("Enter 10 elements: ");
+    
+    for (int i = 0; i < 10; ++i) {
+        scanf("%d", &a[i]);
+    }
+
+    printf("Before sorting: ");
+    for (int i = 0; i < 10; ++i) {
+        printf("%d ", a[i]);
+    }
+    printf("\n");
+    
+    mergesort(a, 0, 9);
+
+    printf("After sorting: ");
+    for (int i = 0; i < 10; ++i) {
+        printf("%d ", a[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+`,
+"5b.txt": `#include <stdio.h>
+
+int a[10], x;
+
+int binsearch(int low, int high)
+{
+    if (low <= high) 
+    {
+        int mid = (low + high) / 2;
+        if (x == a[mid])
+            return mid;
+        else if (x < a[mid])
+            return binsearch(low, mid - 1);
+        else
+            return binsearch(mid + 1, high);
+    }
+    return -1;
+}
+
+int main()
+{
+    int size;
+    printf("Enter size of the list: ");
+    scanf("%d", &size);
+    printf("Enter %d integer values: ", size);
+    for (int i = 0; i < size; i++)
+        scanf("%d", &a[i]);
+    printf("Enter an Element to be searched: ");
+    scanf("%d", &x);
+    int k = binsearch(0, size - 1);
+    if (k == -1)
+        printf("The Element is not found in the list ");
+    else
+        printf("The Element is found at index %d", k);
+    return 0;
+}
+
+`,
+"6k.txt": `#include <stdio.h>
+
+void sort(float w[], float p[], int n) {
+    float ratio;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+
+            float ratio1 = p[i] / w[i];
+            float ratio2 = p[j] / w[j];
+            if (ratio1 < ratio2) {
+
+                float temp = w[i];
+                w[i] = w[j];
+                w[j] = temp;
+
+
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+}
+
+float knapsack(float w[], float p[], float M, int n) {
+    float x[10];
+    float max = 0;
+    int cp, i;
+
+    for (i = 0; i < n; i++) {
+        x[i] = 0;
+    }
+
+    cp = M;
+    sort(w, p, n);
+    i = 0;
+    while (i < n && w[i] <= cp) {
+        x[i] = 1;
+        cp = cp - w[i];
+        i++;
+    }
+
+    if (i < n) {
+        x[i] = cp / w[i];
+    }
+
+    for (i = 0; i < n; i++) {
+        max = max + x[i] * p[i];
+    }
+
+    return max;
+}
+
+int main() {
+    int n;
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+
+    float weights[n], profits[n], M;
+    printf("Enter the weights of the %d items:\n", n);
+    for (int i = 0; i < n; i++) {
+        printf("Weight of item %d: ", i + 1);
+        scanf("%f", &weights[i]);
+    }
+
+    printf("Enter the profits of the %d items:\n", n);
+    for (int i = 0; i < n; i++) {
+        printf("Profit of item %d: ", i + 1);
+        scanf("%f", &profits[i]);
+    }
+
+    printf("Enter the capacity of the knapsack: ");
+    scanf("%f", &M);
+
+    float result = knapsack(weights, profits, M, n);
+    printf("The maximum profit that can be obtained is: %.2f\n", result);
+
+    return 0;
+}#include <stdio.h>
+
+void sort(float w[], float p[], int n) {
+    float ratio;
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+
+            float ratio1 = p[i] / w[i];
+            float ratio2 = p[j] / w[j];
+            if (ratio1 < ratio2) {
+
+                float temp = w[i];
+                w[i] = w[j];
+                w[j] = temp;
+
+
+                temp = p[i];
+                p[i] = p[j];
+                p[j] = temp;
+            }
+        }
+    }
+}
+
+float knapsack(float w[], float p[], float M, int n) {
+    float x[10];
+    float max = 0;
+    int cp, i;
+
+    for (i = 0; i < n; i++) {
+        x[i] = 0;
+    }
+
+    cp = M;
+    sort(w, p, n);
+    i = 0;
+    while (i < n && w[i] <= cp) {
+        x[i] = 1;
+        cp = cp - w[i];
+        i++;
+    }
+
+    if (i < n) {
+        x[i] = cp / w[i];
+    }
+
+    for (i = 0; i < n; i++) {
+        max = max + x[i] * p[i];
+    }
+
+    return max;
+}
+
+int main() {
+    int n;
+    printf("Enter the number of items: ");
+    scanf("%d", &n);
+
+    float weights[n], profits[n], M;
+    printf("Enter the weights of the %d items:\n", n);
+    for (int i = 0; i < n; i++) {
+        printf("Weight of item %d: ", i + 1);
+        scanf("%f", &weights[i]);
+    }
+
+    printf("Enter the profits of the %d items:\n", n);
+    for (int i = 0; i < n; i++) {
+        printf("Profit of item %d: ", i + 1);
+        scanf("%f", &profits[i]);
+    }
+
+    printf("Enter the capacity of the knapsack: ");
+    scanf("%f", &M);
+
+    float result = knapsack(weights, profits, M, n);
+    printf("The maximum profit that can be obtained is: %.2f\n", result);
+
+    return 0;
+}
+
+`,
+"7A.txt": `#include<stdio.h>
+int a [50][50] , cost[50][50];
+void allpair(int);
+int min(int,int);
+void print2d(int n){
+    for(int i = 1 ; i<=n ; i++){
+    printf("\n%d\t",i);
+  for(int j = 1 ; j <= n ;j++)
+    printf("%d ",a[i][j]);
+    printf("\n");
+    }
+}
+int main(){
+  int i,j,n;
+  printf("Enter the no.of nodes : ");
+  scanf("%d",&n);
+  for(i = 1 ; i<=n ; i++)
+  for(j = 1 ; j <= n ;j++){
+    if(i!=j){
+        printf("cost of edges <%d %d> , if there is no edge then enter 1000 ",i,j);
+        scanf("%d",&cost[i][j]);
+    }
+    else cost[i][j]=0;
+  }
+  allpair(n);
+  printf("The Shortest path is :\n");
+  for(i=1;i<=n;i++){
+    printf("\n%d\t",i);
+    for(j=1 ; j<=n ; j++)
+        printf("%d ",a[i][j]);
+    printf("\n");
+  }
+  return 0;
+}
+void allpair(int n ){
+  int i,j,k;
+  for(i = 1; i<=n ; i++)
+    for(j=1 ; j<=n ;j++)
+      a[i][j]=cost[i][j];
+  for(k=1;k<=n;k++){
+    for(i=1;i<=n;i++)
+     for(j=1;j<=n;j++)
+     a[i][j]=min(a[i][j],a[i][k]+a[k][j]);
+     printf("Find A%d\n",k);
+     print2d(n);
+     }
+}
+int min(int a, int b){
+ if(a<b)
+     return a;
+ return b;
+}
+
+`,         
+"8L.txt": `#include <stdio.h>
+#include <string.h>
+
+int c[20][20];
+char d[20][20]; // Variable for direction
+
+void display(char d[][20], char x[], int i, int j) {
+    if (i == 0 || j == 0)
+        return;
+    else {
+        if (d[i][j] == 'd') {
+            display(d, x, i - 1, j - 1);
+            printf("%c", x[i - 1]);
+        } else if (d[i][j] == 'u') {
+            display(d, x, i - 1, j);
+        } else {
+            display(d, x, i, j - 1);
+        }
+    }
+}
+
+void lcs(char x[], char y[]) {
+    int m, n, i, j;
+    m = strlen(x);
+    n = strlen(y); // Using 'n' instead of 'n_len'
+
+    printf("Length of first string: %d\n", m);
+    printf("Length of second string: %d\n", n);
+
+    // Initialize LCS table
+    for (i = 0; i <= m; i++)
+        c[i][0] = 0;
+    for (j = 0; j <= n; j++)
+        c[0][j] = 0;
+
+    // Fill LCS table
+    for (i = 1; i <= m; i++) {
+        for (j = 1; j <= n; j++) {
+            if (x[i - 1] == y[j - 1]) {
+                c[i][j] = c[i - 1][j - 1] + 1;
+                d[i][j] = 'd';
+            } else if (c[i - 1][j] >= c[i][j - 1]) {
+                c[i][j] = c[i - 1][j];
+                d[i][j] = 'u';
+            } else {
+                c[i][j] = c[i][j - 1];
+                d[i][j] = 'l';
+            }
+        }
+    }
+
+    printf("Longest Common Subsequence: ");
+    display(d, x, m, n);
+    printf("\n");
+}
+
+void main() {  // Changed to void main()
+    char x[10], y[10];
+    
+    printf("Enter first string:\n");
+    gets(x);
+    puts(x);
+    
+    printf("Enter second string:\n");
+    gets(y);
+    puts(y);
+    
+    lcs(x, y);
+}
+`,   
+
+"9N.txt": `
+#include<stdio.h>
+#include<math.h>
+int x[20];
+int j;
+int solution_count = 0;
+int place(int k, int i) {
+     for(j = 1; j < k; j++) {
+     if((x[j] == i) || (abs(x[j] - i) == abs(j - k))) {
+          return 0;
+      }
+     }
+ return 1;
+}
+void Nqueens(int k, int n) {
+    int i;
+     for(i = 1; i <= n; i++) {
+     if(place(k, i)) {
+     x[k] = i;
+     if(k == n) {
+     solution_count++;
+     for(j = 1; j <= n; j++) {
+     printf("%d ", x[j]);
+     }
+     printf("\n");
+      } else {
+        Nqueens(k + 1, n);
+       }
+      }
+     }
+}
+int main() {
+     int n;
+     printf("Enter the number of queens: ");
+     scanf("%d", &n);
+     printf("Solutions are: \n");
+     Nqueens(1, n);
+     printf("Total solutions: %d\n", solution_count);
+     return 0;
+}
+`,
+
+"10na.txt": `#include <stdio.h>
+#include <string.h>
+
+// Function prototype (declaration)
+int naive(char textStr[], char patternStr[]);
+
+void main() {
+    char textStr[100], patternStr[100];
+    int decision;
+
+    printf("Enter the text string: ");
+    gets(textStr);
+
+    printf("\nEnter the pattern string: ");
+    gets(patternStr);
+
+    decision = naive(textStr, patternStr);
+
+    printf("\n");
+
+    if (decision != -1)
+        printf("\"%s\" is a substring of \"%s\"\n", patternStr, textStr);
+    else
+        printf("\"%s\" is not a substring of \"%s\"\n", patternStr, textStr);
+
+    printf("\n");
+}
+
+// Function definition (after main)
+int naive(char textStr[], char patternStr[]) {
+    int i, j;
+    int textLen = strlen(textStr);
+    int patternLen = strlen(patternStr);
+
+    for (i = 0; i <= textLen - patternLen; i++) {
+        j = 0;
+        while (j < patternLen && textStr[i + j] == patternStr[j]) {
+            j++;
+        }
+        if (j == patternLen)
+            return i;  // Pattern found at index i
+    }
+    return -1;  // Pattern not found
+}
+
+`,
+            // Add all your other files here in the same format
+            // "filename.txt": `file content goes here`
+        };
+
+        // DOM elements
+        const fileList = document.getElementById('fileList');
+        const fileContent = document.getElementById('fileContent');
+        const copyBtn = document.getElementById('copyBtn');
+        const searchInput = document.getElementById('search');
+
+        // Display file list
+        function displayFiles(searchTerm = '') {
+            fileList.innerHTML = '';
+            
+            Object.keys(textFiles)
+                .filter(filename => filename.toLowerCase().includes(searchTerm.toLowerCase()))
+                .forEach(filename => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.textContent = filename;
+                    fileItem.addEventListener('click', () => {
+                        fileContent.textContent = textFiles[filename];
+                        // Highlight selected file
+                        document.querySelectorAll('.file-item').forEach(item => {
+                            item.style.background = item === fileItem ? '#d0d0d0' : '#f0f0f0';
+                        });
+                    });
+                    fileList.appendChild(fileItem);
+                });
+        }
+
+        // Initial display
+        displayFiles();
+
+        // Copy button
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(fileContent.textContent)
+                .then(() => {
+                    alert('Content copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy content');
+                });
+        });
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            displayFiles(e.target.value);
+        });
+    </script>
+</body>
+</html>
